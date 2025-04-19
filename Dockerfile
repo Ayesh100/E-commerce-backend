@@ -25,6 +25,10 @@ COPY . .
 
 RUN cp .env.example .env
 
+# Make and use entrypoint.sh
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
 # Install Laravel dependencies
 RUN composer install --no-dev --optimize-autoloader
 
@@ -33,6 +37,6 @@ RUN chown -R www-data:www-data /var/www && chmod -R 755 /var/www
 
 # Expose port and run Laravel's built-in server
 EXPOSE 8000
-CMD php artisan key:generate && php artisan config:cache && php artisan migrate --force && php artisan db:seed --force && php artisan serve --host=0.0.0.0 --port=8000
-
+# Set the entrypoint
+CMD ["/entrypoint.sh"]
 
