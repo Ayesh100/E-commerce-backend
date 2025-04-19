@@ -33,7 +33,7 @@ return [
 
     'paths' => ['api/*', 'sanctum/csrf-cookie'],
     'allowed_methods' => ['*'],
-    'allowed_origins' => ['http://localhost:5173', 'http://onlinestore.test'],
+    'allowed_origins' => ['https://myreactecommerce.netlify.app', 'https://mylaravelecommerce-x59pn02e.b4a.run'],
     'allowed_origins_patterns' => [],
     'allowed_headers' => ['*'],
     'exposed_headers' => [],
