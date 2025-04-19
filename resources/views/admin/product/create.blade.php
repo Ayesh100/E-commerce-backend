@@ -131,7 +131,7 @@
     </div>
 
     <script>
-        $(document).ready(function () {
+       $(document).ready(function () {
     const oldBrandId = "{{ old('brand_id') }}"; // Retrieve the old selected brand ID
 
     $('#category_id').on('change', function () {
@@ -140,23 +140,27 @@
         if (categoryId) {
             // AJAX call to fetch brands based on selected category
             $.ajax({
-                url: "{{ url('/api/product') }}/" + categoryId,
+                url: "{{ url('/api/product') }}/" + categoryId, // Adjust URL as needed
                 type: "GET",
                 success: function (data) {
                     // Clear and enable the brand dropdown
                     $('#brand_id').empty().append('<option value="">Select Brand</option>');
-                    $('#brand_id').prop('disabled', false);
+                    $('#brand_id').prop('disabled', false);  // Ensure it's enabled
 
                     // Populate the brand dropdown with fetched brands
                     $.each(data.brands, function (index, brand) {
                         $('#brand_id').append('<option value="' + brand.id + '"' + (oldBrandId == brand.id ? ' selected' : '') + '>' + brand.brand_name + '</option>');
                     });
+                },
+                error: function () {
+                    // Optionally handle error if brands couldn't be fetched
+                    alert('Error fetching brands for the selected category.');
                 }
             });
         } else {
             // Reset and disable the brand dropdown if no category is selected
             $('#brand_id').empty().append('<option value="">Select Brand</option>');
-            $('#brand_id').prop('disabled', true);
+            $('#brand_id').prop('disabled', true); // Disable if no category is selected
         }
     });
 
