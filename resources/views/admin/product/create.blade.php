@@ -132,39 +132,35 @@
 
     <script>
        $(document).ready(function () {
-    const oldBrandId = "{{ old('brand_id') }}"; // Retrieve the old selected brand ID
+    const oldBrandId = "{{ old('brand_id') }}";
 
     $('#category_id').on('change', function () {
         const categoryId = $(this).val();
 
         if (categoryId) {
-            // AJAX call to fetch brands based on selected category
             $.ajax({
-                url: "{{ url('/api/product') }}/" + categoryId, // Adjust URL as needed
+                url: "{{ url('/api/category') }}/" + categoryId + "/brands",
                 type: "GET",
-                success: function (data) {
-                    // Clear and enable the brand dropdown
+                success: function (brands) {
                     $('#brand_id').empty().append('<option value="">Select Brand</option>');
-                    $('#brand_id').prop('disabled', false);  // Ensure it's enabled
+                    $('#brand_id').prop('disabled', false);
 
-                    // Populate the brand dropdown with fetched brands
-                    $.each(data.brands, function (index, brand) {
-                        $('#brand_id').append('<option value="' + brand.id + '"' + (oldBrandId == brand.id ? ' selected' : '') + '>' + brand.brand_name + '</option>');
+                    $.each(brands, function (index, brand) {
+                        $('#brand_id').append(
+                            `<option value="${brand.id}" ${oldBrandId == brand.id ? 'selected' : ''}>${brand.brand_name}</option>`
+                        );
                     });
                 },
                 error: function () {
-                    // Optionally handle error if brands couldn't be fetched
                     alert('Error fetching brands for the selected category.');
                 }
             });
         } else {
-            // Reset and disable the brand dropdown if no category is selected
-            $('#brand_id').empty().append('<option value="">Select Brand</option>');
-            $('#brand_id').prop('disabled', true); // Disable if no category is selected
+            $('#brand_id').empty().append('<option value="">Select Brand</option>').prop('disabled', true);
         }
     });
 
-    // Trigger change event on page load to populate brands for the old category
+    // Trigger on page load if old value exists
     if ("{{ old('category_id') }}") {
         $('#category_id').val("{{ old('category_id') }}").trigger('change');
     }
