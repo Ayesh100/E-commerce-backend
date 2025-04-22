@@ -131,40 +131,44 @@
     </div>
 
     <script>
-       $(document).ready(function () {
-    const oldBrandId = "{{ old('brand_id') }}";
+     $(document).ready(function () {
+        const oldCategoryId = "{{ old('category_id', $product->category_id) }}";
+        const oldBrandId = "{{ old('brand_id', $product->brand_id) }}";
 
-    $('#category_id').on('change', function () {
-        const categoryId = $(this).val();
+        function loadBrands(categoryId, selectedBrandId = null) {
+            if (categoryId) {
+                $.ajax({
+                    url: `/api/category/${categoryId}/brands`,
+                    type: 'GET',
+                    success: function (brands) {
+                        $('#brand_id').empty().append('<option value="">Select Brand</option>');
+                        $('#brand_id').prop('disabled', false);
 
-        if (categoryId) {
-            $.ajax({
-                url: "{{ url('/api/category') }}/" + categoryId + "/brands",
-                type: "GET",
-                success: function (brands) {
-                    $('#brand_id').empty().append('<option value="">Select Brand</option>');
-                    $('#brand_id').prop('disabled', false);
-
-                    $.each(brands, function (index, brand) {
-                        $('#brand_id').append(
-                            `<option value="${brand.id}" ${oldBrandId == brand.id ? 'selected' : ''}>${brand.brand_name}</option>`
-                        );
-                    });
-                },
-                error: function () {
-                    alert('Error fetching brands for the selected category.');
-                }
-            });
-        } else {
-            $('#brand_id').empty().append('<option value="">Select Brand</option>').prop('disabled', true);
+                        $.each(brands, function (index, brand) {
+                            $('#brand_id').append(
+                                `<option value="${brand.id}" ${brand.id == selectedBrandId ? 'selected' : ''}>${brand.brand_name}</option>`
+                            );
+                        });
+                    },
+                    error: function () {
+                        alert('Failed to load brands.');
+                    }
+                });
+            } else {
+                $('#brand_id').empty().append('<option value="">Select Brand</option>');
+                $('#brand_id').prop('disabled', true);
+            }
         }
-    });
 
-    // Trigger on page load if old value exists
-    if ("{{ old('category_id') }}") {
-        $('#category_id').val("{{ old('category_id') }}").trigger('change');
-    }
-});
+        // On page load: Load brands for existing category
+        loadBrands(oldCategoryId, oldBrandId);
+
+        // On category change
+        $('#category_id').on('change', function () {
+            const selectedCategory = $(this).val();
+            loadBrands(selectedCategory);
+        });
+    });
 
     </script>
 
