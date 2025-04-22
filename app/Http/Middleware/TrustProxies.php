@@ -2,27 +2,19 @@
 
 namespace App\Http\Middleware;
 
-use Illuminate\Http\Middleware\TrustProxies as Middleware;
 use Illuminate\Http\Request;
+use Fideloper\Proxy\TrustProxies as Middleware; // or use // Symfony\Component\HttpFoundation\Request; depending on your Laravel version
 
 class TrustProxies extends Middleware
 {
     /**
-     * The trusted proxies for this application.
-     *
-     * @var array<int, string>|string|null
+     * Set this to '*' so all proxies are trusted.
+     * Or put your proxy IPs here if you prefer.
      */
-    protected $proxies;
+    protected $proxies = '*';
 
     /**
-     * The headers that should be used to detect proxies.
-     *
-     * @var int
+     * Ensure Laravel uses all forwarded headers, including X-Forwarded-Proto.
      */
-    protected $headers =
-        Request::HEADER_X_FORWARDED_FOR |
-        Request::HEADER_X_FORWARDED_HOST |
-        Request::HEADER_X_FORWARDED_PORT |
-        Request::HEADER_X_FORWARDED_PROTO |
-        Request::HEADER_X_FORWARDED_AWS_ELB;
+    protected $headers = Request::HEADER_X_FORWARDED_ALL;
 }
