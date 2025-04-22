@@ -24,5 +24,9 @@ class AppServiceProvider extends ServiceProvider
         if (env('APP_ENV') === 'production') {
         URL::forceScheme('https');
     }
-    }
+        URL::forceRootUrl(config('app.url'));
+
+    // And if you're on HTTPS, force that too:
+    URL::forceScheme(parse_url(config('app.url'), PHP_URL_SCHEME));
+
 }
