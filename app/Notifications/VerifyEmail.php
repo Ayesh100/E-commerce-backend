@@ -17,6 +17,7 @@ class VerifyEmail extends BaseVerifyEmail
         );
 
         return (new MailMessage)
+            ->replyTo('ayesh7725@gamil.com')
             ->subject('Verify Your Email')
             ->line('Click the button below to verify your email address.')
             ->action('Verify Email', $verificationUrl);
