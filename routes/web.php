@@ -32,7 +32,13 @@ Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
 
 // Orders Controller
 
-
+Route::get('/clear', function () {
+    Artisan::call('config:clear');
+    Artisan::call('cache:clear');
+    Artisan::call('route:clear');
+    Artisan::call('view:clear');
+    return 'Cleared!';
+});
 
 
 Route::group(['middleware' => ['role:super-admin|admin']], function () {
