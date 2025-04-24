@@ -6,11 +6,16 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Customer;
 use Illuminate\Auth\Events\Verified;
+use Illuminate\Support\Facades\URL;
+
 
 class VerificationController extends Controller
 {
     public function verify(Request $request)
     {
+        if (! URL::hasValidSignature($request)) {
+        return redirect('https://myreactecommerce.netlify.app/verify-status?status=error&message=Invalid or expired signature');
+        }
         // Retrieve user by id from the route parameter
         $user = Customer::find($request->route('id'));
 
