@@ -66,7 +66,6 @@ Route::post('/register', [AuthController::class, 'register']);
 
 
 Route::get('/email/verify/{id}/{hash}', [VerificationController::class, 'verify'])
-    ->middleware(['signed'])
     ->name('verification.verify');
 
 Route::post('/resend-verification', [VerificationController::class, 'resendVerificationEmail']);
