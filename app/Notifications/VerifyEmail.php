@@ -4,23 +4,20 @@ namespace App\Notifications;
 
 use Illuminate\Auth\Notifications\VerifyEmail as BaseVerifyEmail;
 use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Support\Facades\URL;
 
 class VerifyEmail extends BaseVerifyEmail
 {
     public function toMail($notifiable)
     {
-        $verificationUrl = URL::temporarySignedRoute(
-            'verification.verify',
-            now()->addMinutes(60),
-            ['id' => $notifiable->getKey(), 'hash' => sha1($notifiable->getEmailForVerification())]
-        );
+        // Manually build the verification URL
+        $verificationUrl = 'https://mylaravelecommerce-x59pn02e.b4a.run/api/email/verify/' 
+            . $notifiable->id . '/' . sha1($notifiable->email);
 
+        // Return the email message
         return (new MailMessage)
-            ->replyTo('ayesh7725@gmail.com')
-            ->subject('Verify Your Email')
-            ->line('Click the button below to verify your email address.')
-            ->action('Verify Email', $verificationUrl);
+            ->subject('Verify Your Email Address')
+            ->line('Please click the button below to verify your email address.')
+            ->action('Verify Email', $verificationUrl)
+            ->line('If you did not create an account, no further action is required.');
     }
-    
 }
