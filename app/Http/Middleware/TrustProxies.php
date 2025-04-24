@@ -1,23 +1,24 @@
 <?php
 
-namespace App\Http\Middleware;
+namespace App\Providers;
 
-use Illuminate\Http\Middleware\TrustProxies as Middleware;
-use Symfony\Component\HttpFoundation\Request;
+use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\URL;
 
-class TrustProxies extends Middleware
+class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Trust all proxies (or specify an array of IPs/CIDRs).
-     *
-     * @var array|string|null
-     */
-    protected $proxies = '*';
+    public function register(): void
+    {
+        //
+    }
 
-    /**
-     * Use all of the forwarded headers (X-Forwarded-For, X-Forwarded-Proto, etc.).
-     *
-     * @var int
-     */
-    protected $headers = Request::HEADER_X_FORWARDED_ALL;
+    public function boot(): void
+    {
+        // Only run this in production
+        if ($this->app->environment('production')) {
+            // Ensure all URLs use the right root (APP_URL) and scheme (https)
+            URL::forceRootUrl(config('app.url'));
+            URL::forceScheme('https');
+        }
+    }
 }
