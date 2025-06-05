@@ -17,7 +17,7 @@ return [
 
     'stateful' => explode(',', env('SANCTUM_STATEFUL_DOMAINS', sprintf(
         '%s%s',
-        'localhost,localhost:3000,5173,127.0.0.1,127.0.0.1:8000,::1','onlinestore.test',
+        'localhost,localhost:3000,5173,127.0.0.1,127.0.0.1:8000,::1','myreactecommerce.netlify.app',
         Sanctum::currentApplicationUrlWithPort()
     ))),
 
