@@ -147,7 +147,7 @@
                 if (categoryId) {
                     // AJAX call to fetch brands based on selected category
                     $.ajax({
-                        url: "{{ url('/api/product') }}/" + categoryId,
+                        url: "{{ url('/api/products') }}/" + categoryId,
                         type: "GET",
                         success: function(data) {
                             // Clear and enable the brand dropdown
