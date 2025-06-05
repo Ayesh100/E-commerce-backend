@@ -132,8 +132,9 @@
 
     <script>
      $(document).ready(function () {
-        const oldCategoryId = "{{ old('category_id', $product->category_id) }}";
-        const oldBrandId = "{{ old('brand_id', $product->brand_id) }}";
+       const oldCategoryId = "{{ old('category_id') }}";
+const oldBrandId = "{{ old('brand_id') }}";
+
 
         function loadBrands(categoryId, selectedBrandId = null) {
             if (categoryId) {
