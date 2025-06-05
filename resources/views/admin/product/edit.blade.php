@@ -45,6 +45,7 @@
                             <div class="row">
                                 <div class="col-lg-8">
                                     <div class="border border-3 p-4 rounded">
+                                        {{-- Category dropdown --}}
                                         <div class="mb-3">
                                             <label for="category_id" class="form-label">Select Category</label>
                                             <select name="category_id" id="category_id"
@@ -59,16 +60,21 @@
                                             </select>
                                             <span class="text-danger">{{ $errors->first('category_id') }}</span>
                                         </div>
+
+                                        {{-- Brand dropdown (initially enabled if product already has a category) --}}
                                         <div class="mb-3">
                                             <label for="brand_id" class="form-label">Select Brand</label>
                                             <select name="brand_id" id="brand_id"
-                                                class="form-select @error('brand_id') is-invalid @enderror" {{ old('category_id', $product->category_id) ? '' : 'disabled' }}>>
+                                                class="form-select @error('brand_id') is-invalid @enderror"
+                                                {{ old('category_id', $product->category_id) ? '' : 'disabled' }}>
                                                 <option value="">Choose Brand</option>
                                             </select>
                                             <small class="text-muted">Please select a category to enable brand
                                                 selection.</small>
                                             <span class="text-danger">{{ $errors->first('brand_id') }}</span>
                                         </div>
+
+                                        {{-- Other product fields --}}
                                         <div class="mb-3">
                                             <label for="product_name" class="form-label">Product Name</label>
                                             <input type="text" value="{{ old('product_name', $product->product_name) }}"
@@ -82,7 +88,7 @@
                                             <span class="text-danger">{{ $errors->first('product_img') }}</span>
                                             <p class="mt-3 text-success">Current Logo</p>
                                             <img src="/uploads/{{ $product->product_img }}" width="100" height="100"
-                                                alt="">
+                                                alt="Current product image">
                                         </div>
                                         <div class="mb-3">
                                             <label for="product_dscp" class="form-label">Product Description</label>
@@ -92,6 +98,8 @@
                                         </div>
                                     </div>
                                 </div>
+
+                                {{-- Right column --}}
                                 <div class="col-lg-4">
                                     <div class="border border-3 p-4 rounded">
                                         <div class="row g-3">
@@ -129,6 +137,7 @@
                                         </div>
                                     </div>
                                 </div>
+
                             </div><!--end row-->
                         </div>
                     </form>
@@ -139,47 +148,51 @@
 
     <script>
         $(document).ready(function() {
-            const oldCategoryId =
-            "{{ old('category_id', $product->category_id) }}"; // Retrieve the old or current category ID
-            const oldBrandId = "{{ old('brand_id', $product->brand_id) }}"; // Retrieve the old or current brand ID
+            // Retrieve old (or current) category and brand IDs
+            const oldCategoryId = "{{ old('category_id', $product->category_id) }}";
+            const oldBrandId = "{{ old('brand_id', $product->brand_id) }}";
 
             function loadBrands(categoryId, selectedBrandId = null) {
                 if (categoryId) {
-                    // AJAX call to fetch brands based on selected category
                     $.ajax({
-                        url: `/api/category/${categoryId}/brands`,
+                        url: `/api/category/${categoryId}/brands`, // ← correct endpoint
                         type: "GET",
                         success: function(data) {
-                            // Clear and enable the brand dropdown
+                            // 'data' is an array of brand objects, not { brands: [...] }
                             $('#brand_id').empty().append('<option value="">Select Brand</option>');
                             $('#brand_id').prop('disabled', false);
 
-                            // Populate the brand dropdown with fetched brands
-                            $.each(data.brands, function(index, brand) {
-                                $('#brand_id').append('<option value="' + brand.id + '"' +
-                                    (selectedBrandId == brand.id ? ' selected' : '') +
-                                    '>' + brand.brand_name + '</option>');
+                            // Iterate over 'data' directly
+                            $.each(data, function(index, brand) {
+                                $('#brand_id').append(
+                                    `<option value="${brand.id}" ${selectedBrandId == brand.id ? 'selected' : ''}>
+                                        ${brand.brand_name}
+                                    </option>`
+                                );
                             });
+                        },
+                        error: function() {
+                            console.error('Could not fetch brands for category', categoryId);
+                            $('#brand_id').empty().append('<option value="">Select Brand</option>').prop('disabled', true);
                         }
                     });
                 } else {
-                    // Reset and disable the brand dropdown if no category is selected
+                    // No category selected → reset and disable brand dropdown
                     $('#brand_id').empty().append('<option value="">Select Brand</option>');
                     $('#brand_id').prop('disabled', true);
                 }
             }
 
-            // Handle category change
-            $('#category_id').on('change', function() {
-                const categoryId = $(this).val();
-                loadBrands(categoryId);
-            });
-
-            // On page load, trigger loading brands if a category is pre-selected
+            // 1) On page load, if a category is already selected (edit scenario), load its brands:
             if (oldCategoryId) {
-                $('#category_id').val(oldCategoryId).trigger('change');
-                loadBrands(oldCategoryId, oldBrandId); // Load brands and select the correct one
+                $('#category_id').val(oldCategoryId); // ensure the category <select> is set
+                loadBrands(oldCategoryId, oldBrandId);
             }
+
+            // 2) When the user changes category, reload the brand list:
+            $('#category_id').on('change', function() {
+                loadBrands($(this).val());
+            });
         });
     </script>
 
